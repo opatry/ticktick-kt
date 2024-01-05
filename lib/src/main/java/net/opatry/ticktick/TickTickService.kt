@@ -127,7 +127,25 @@ class HttpTickTickService(private val httpClient: HttpClient) : TickTickService 
     }
 
     override suspend fun updateTask(taskId: String, request: TaskUpdateRequest): Task {
-        return httpClient.postOrThrow("open/v1/task/${taskId}", request)
+        require(taskId == request.id) { "Provided task id ($taskId) and update request id (${request.id}) doesn't match." }
+        // FIXME edge cases encountered
+        //  if the project id provided in the task is invalid, we receive a 500 error from server
+        //  if the project id doesn't match the updated task's one, we receive a 200 success without data (can't be used to move a task to another project)
+        //  return httpClient.postOrThrow("open/v1/task/${taskId}", request)
+        val response = httpClient.post("open/v1/task/${taskId}") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        if (response.status.isSuccess()) {
+            if (response.bodyAsText().isNotEmpty()) {
+                return response.body()
+            } else {
+                throw ClientRequestException(response, "Task not updated (invalid project id? ${request.projectId})")
+            }
+        } else {
+            throw ClientRequestException(response, response.bodyAsText())
+        }
     }
 
     override suspend fun completeTask(projectId: String, taskId: String) {

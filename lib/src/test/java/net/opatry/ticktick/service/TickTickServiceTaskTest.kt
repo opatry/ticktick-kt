@@ -310,7 +310,7 @@ class TickTickServiceTaskTest {
                 runBlocking {
                     ticktickService.updateTask(
                         "6247ee29630c800f064fd145",
-                        TaskUpdateRequest(projectId = "", id = "", content = "Bar")
+                        TaskUpdateRequest(projectId = "6226ff9877acee87727f6bca", id = "6247ee29630c800f064fd145", content = "Bar")
                     )
                 }
             }
