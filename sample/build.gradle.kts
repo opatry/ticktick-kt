@@ -20,7 +20,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-rootProject.name = "ticktick-kt"
+plugins {
+    alias(libs.plugins.jetbrains.kotlin.jvm)
+}
 
-include(":lib")
-include(":sample")
+dependencies {
+    implementation(project(":lib"))
+}
